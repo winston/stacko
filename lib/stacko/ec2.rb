@@ -4,6 +4,20 @@ module Stacko
 
   class EC2
 
+    class << self
+      def create
+        # Puts statement for status!
+      end
+
+      def destroy
+        # read .stacko
+        # destroy key pair
+        # destroy security group
+        # destroy instance
+        # destroy .stacko
+      end
+    end
+
     def initialize
       # Use Rails Env
 
@@ -59,13 +73,6 @@ module Stacko
     def chef_instance
       # knife prepare
       # knife cook
-    end
-
-    def destroy
-      # destroy key pair
-      # destroy security group
-      # destroy instance
-      # destroy .stacko
     end
 
     private
