@@ -10,6 +10,5 @@ end
 
 task :default => :spec
 
-## FIXME
-# Import Gem's rake tasks
-import  "lib/tasks/stacko.rake"
+# Load Gem's rake tasks
+load  "tasks/stacko.rake"
