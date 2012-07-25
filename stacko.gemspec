@@ -19,5 +19,4 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency "bundler", ">= 1.1.4"
   gem.add_development_dependency "rspec"  , ">= 2.11.0"
-  gem.add_development_dependency "rails"  , ">= 3.2.6"
 end
