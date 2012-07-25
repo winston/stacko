@@ -2,8 +2,7 @@ require 'aws-sdk'
 
 module Stacko
 
-  class EC2
-
+  class Server
     class << self
 
       # Runs through the steps for creating a new EC2 instance
@@ -25,7 +24,7 @@ module Stacko
       #
       def create(yaml, environment)
         if valid_config?(yaml, environment)
-          stack = Stacko::EC2.new(yaml["aws"])
+          stack = Stacko::Server.new(yaml["aws"])
           stack.create_key_pair
           stack.create_security_group
           stack.create_instance(yaml["ec2"][environment])

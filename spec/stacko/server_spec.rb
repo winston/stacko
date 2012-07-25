@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Stacko::EC2 do
+describe Stacko::Server do
 
   # Mocks
-  let(:stack)               { Stacko::EC2.new(aws_config) }
+  let(:stack)               { Stacko::Server.new(aws_config) }
   let(:aws_ec2)             { mock(:aws_ec2) }
   let(:key_pair)            { mock(:key_pair, private_key: "oh so private") }
   let(:security_group)      { mock(:security_group) }
@@ -25,38 +25,38 @@ describe Stacko::EC2 do
     let(:fake) { mock(:stack) }
 
     context "valid config" do
-      before { Stacko::EC2.stub!(:valid_config?) { true } }
+      before { Stacko::Server.stub!(:valid_config?) { true } }
 
       it "invokes the steps to create an EC2 instance" do
-        Stacko::EC2.should_receive(:new).with(aws_config) { fake }
+        Stacko::Server.should_receive(:new).with(aws_config) { fake }
         fake.should_receive(:create_key_pair)
         fake.should_receive(:create_security_group)
         fake.should_receive(:create_instance).with(ec2_config)
 
-        Stacko::EC2.create(yaml, environment)
+        Stacko::Server.create(yaml, environment)
       end
     end
 
     context "invalid config" do
-      before { Stacko::EC2.stub!(:valid_config?) { false } }
+      before { Stacko::Server.stub!(:valid_config?) { false } }
 
       it "exits gracefully" do
-        Stacko::EC2.should_not_receive(:new)
+        Stacko::Server.should_not_receive(:new)
 
-        Stacko::EC2.create(yaml, environment)
+        Stacko::Server.create(yaml, environment)
       end
     end
   end
 
   describe ".valid_config?" do
     it "returns nil when all required keys are present" do
-      Stacko::EC2.valid_config?(yaml, environment).should be_true
+      Stacko::Server.valid_config?(yaml, environment).should be_true
     end
 
     it "returns false when one or more required keys are absent" do
       yaml.delete("aws")
 
-      Stacko::EC2.valid_config?(yaml, environment).should be_false
+      Stacko::Server.valid_config?(yaml, environment).should be_false
     end
   end
 
@@ -64,7 +64,7 @@ describe Stacko::EC2 do
     it "initializes AWS config with environment variables" do
       AWS::EC2.should_receive(:new).with(aws_config)
 
-      Stacko::EC2.new(aws_config)
+      Stacko::Server.new(aws_config)
     end
   end
 
