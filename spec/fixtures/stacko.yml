@@ -1,0 +1,11 @@
+aws:
+  access_key_id: "123"
+  secret_access_key: "abc"
+  ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
+ec2:
+  staging:
+    image_id: "ami-1234"
+    instance_type: "m1.small"
+  production:
+    image_id: "ami-1234"
+    instance_type: "m1.large"

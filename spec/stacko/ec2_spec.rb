@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Stacko::EC2 do
+
   # Mocks
   let(:stack)               { Stacko::EC2.new(aws_config) }
   let(:aws_ec2)             { mock(:aws_ec2) }
@@ -9,20 +10,11 @@ describe Stacko::EC2 do
   let(:file)                { StringIO.new }
 
   # Expectations
+  let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.yml")) }
+  let(:environment)         { "production" }
+  let(:aws_config)          { yaml["aws"] }
+  let(:ec2_config)          { yaml["ec2"][environment] }
   let(:project)             { "stacko" }
-  let(:aws_config) do
-    {
-      "access_key_id"     => "123",
-      "secret_access_key" => "abc",
-      "ec2_endpoint"      => "ec2.ap-southeast-1.amazonaws.com"
-    }
-  end
-  let(:ec2_config) do
-    {
-      "image_id"          => "ami-1234",
-      "instance_id"       => "m1.small"
-    }
-  end
   let(:key_name)            { project }
   let(:key_pair_filename)   { "/users/winston/.ec2/#{key_name}.pem" }
   let(:security_group_name) { "#{project}-web" }
@@ -32,17 +24,39 @@ describe Stacko::EC2 do
   describe ".create" do
     let(:fake) { mock(:stack) }
 
-    it "invokes the steps to create an EC2 instance" do
-      Stacko::EC2.should_receive(:new).with(aws_config) { fake }
-      fake.should_receive(:create_key_pair)
-      fake.should_receive(:create_security_group)
-      fake.should_receive(:create_instance).with(ec2_config)
+    context "valid config" do
+      before { Stacko::EC2.stub!(:valid_config?) { true } }
 
-      Stacko::EC2.create(aws_config, ec2_config)
+      it "invokes the steps to create an EC2 instance" do
+        Stacko::EC2.should_receive(:new).with(aws_config) { fake }
+        fake.should_receive(:create_key_pair)
+        fake.should_receive(:create_security_group)
+        fake.should_receive(:create_instance).with(ec2_config)
+
+        Stacko::EC2.create(yaml, environment)
+      end
     end
 
-    it "raises exception when config is not complete" do
+    context "invalid config" do
+      before { Stacko::EC2.stub!(:valid_config?) { false } }
 
+      it "exits gracefully" do
+        Stacko::EC2.should_not_receive(:new)
+
+        Stacko::EC2.create(yaml, environment)
+      end
+    end
+  end
+
+  describe ".valid_config?" do
+    it "returns nil when all required keys are present" do
+      Stacko::EC2.valid_config?(yaml, environment).should be_true
+    end
+
+    it "returns false when one or more required keys are absent" do
+      yaml.delete("aws")
+
+      Stacko::EC2.valid_config?(yaml, environment).should be_false
     end
   end
 
