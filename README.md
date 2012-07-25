@@ -18,7 +18,22 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### 1. Create config/stacko.yml
+
+    aws:
+      access_key_id: "123"
+      secret_access_key: "abc"
+      ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
+    ec2:
+      staging:
+        image_id: "ami-1234"
+        instance_type: "m1.small"
+      production:
+        image_id: "ami-1234"
+        instance_type: "m1.large"
+
+### 2. rake stacko:ec2:create[environment]
+..where `environment` is one of the defined targets in config/stacko.yml. Using the example above, it is either "staging" or "production".
 
 ## Contributing
 
