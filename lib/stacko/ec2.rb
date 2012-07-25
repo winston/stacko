@@ -30,7 +30,7 @@ module Stacko
           stack.create_security_group
           stack.create_instance(yaml["ec2"][environment])
         else
-          puts "==> We failed to create an EC2 instance. Please ensure that your config file is properly formatted. Goodbye.."
+          puts "==> Stacko failed to create an EC2 instance. Please ensure that your config file is properly formatted."
         end
       end
 
@@ -68,6 +68,8 @@ module Stacko
     #       - ec2_endpoint [optional]     AWS region.             Defaults to "ec2.us-east-1.amazonaws.com".
     #
     def initialize(config)
+      puts "==> Initializing EC2..."
+
       @aws_ec2 = AWS::EC2.new(config)
     end
 
@@ -112,7 +114,7 @@ module Stacko
     def create_instance(config)
       puts "==> Creating EC2 instance..."
 
-      instance = @aws_ec2.instances.create( config.merge( { "key_name" => key_name, "security_groups" => security_group_name } ) )
+      instance = @aws_ec2.instances.create( config.merge( { "key_name" => key_name, "security_groups" => [security_group_name] } ) )
 
       while instance.status == :pending
         print "."

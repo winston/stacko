@@ -117,7 +117,7 @@ describe Stacko::EC2 do
     it "creates a new instance on AWS" do
       aws_ec2.should_receive(:instances) { aws_ec2 }
       aws_ec2.should_receive(:create)
-        .with( ec2_config.merge( { "key_name" => key_name, "security_groups" => security_group_name } ) )
+        .with( ec2_config.merge( { "key_name" => key_name, "security_groups" => [security_group_name] } ) )
         .and_return( mock(:instance, id: "instance", status: :running) )
 
       stack.should_receive(:save_to_yaml).with("instance")
