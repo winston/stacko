@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Stacko::EC2 do
   # Mocks
-  let(:stack)               { stack = Stacko::EC2.new }
+  let(:stack)               { Stacko::EC2.new(aws_config) }
   let(:aws_ec2)             { mock(:aws_ec2) }
   let(:key_pair)            { mock(:key_pair, private_key: "oh so private") }
   let(:security_group)      { mock(:security_group) }
@@ -10,32 +10,51 @@ describe Stacko::EC2 do
 
   # Expectations
   let(:project)             { "stacko" }
-  let(:access_key_id)       { "123" }
-  let(:secret_access_key)   { "abc" }
-  let(:ec2_endpoint)        { "ec2.ap-southeast-1.amazonaws.com" }
-  let(:image_id)            { "ami-1234" }
-  let(:instance_type)       { "m1.micro" }
+  let(:aws_config) do
+    {
+      "access_key_id"     => "123",
+      "secret_access_key" => "abc",
+      "ec2_endpoint"      => "ec2.ap-southeast-1.amazonaws.com"
+    }
+  end
+  let(:ec2_config) do
+    {
+      "image_id"          => "ami-1234",
+      "instance_id"       => "m1.small"
+    }
+  end
   let(:key_name)            { project }
   let(:key_pair_filename)   { "/users/winston/.ec2/#{key_name}.pem" }
   let(:security_group_name) { "#{project}-web" }
 
-  before { stub_const("ENV", {"HOME" => "/users/winston", "AWS_ACCESS_KEY_ID" => access_key_id, "AWS_SECRET_ACCESS_KEY" => secret_access_key, "EC2_URL" => ec2_endpoint}) }
+  before { stub_const("ENV", {"HOME" => "/users/winston"}) }
 
-  describe "initialize" do
-    it "initializes AWS config with environment variables" do
-      AWS::EC2.should_receive(:new).with({access_key_id: access_key_id, secret_access_key: secret_access_key, ec2_endpoint: ec2_endpoint})
+  describe ".create" do
+    let(:fake) { mock(:stack) }
 
-      stack
+    it "invokes the steps to create an EC2 instance" do
+      Stacko::EC2.should_receive(:new).with(aws_config) { fake }
+      fake.should_receive(:create_key_pair)
+      fake.should_receive(:create_security_group)
+      fake.should_receive(:create_instance).with(ec2_config)
+
+      Stacko::EC2.create(aws_config, ec2_config)
     end
 
-    it "fails when environment variables are missing" do
-      stub_const("ENV", {})
+    it "raises exception when config is not complete" do
 
-      expect { stack }.to raise_exception(AWS::Errors::MissingCredentialsError)
     end
   end
 
-  describe "create_key_pair" do
+  describe "#initialize" do
+    it "initializes AWS config with environment variables" do
+      AWS::EC2.should_receive(:new).with(aws_config)
+
+      Stacko::EC2.new(aws_config)
+    end
+  end
+
+  describe "#create_key_pair" do
     before { AWS::EC2.should_receive(:new) { aws_ec2 } }
 
     it "creates a key pair and saves the private key to ~/.ec2/<project>.pem" do
@@ -47,9 +66,16 @@ describe Stacko::EC2 do
       stack.create_key_pair
       file.string.should == key_pair.private_key
     end
+
+    it "rescues and continues when exception for duplicate key pair is raised" do
+      aws_ec2.should_receive(:key_pairs) { aws_ec2 }
+      aws_ec2.should_receive(:create).with(key_name).and_raise(AWS::EC2::Errors::InvalidKeyPair::Duplicate)
+
+      stack.create_key_pair
+    end
   end
 
-  describe "create_security_group" do
+  describe "#create_security_group" do
     before { AWS::EC2.should_receive(:new) { aws_ec2 } }
 
     it "creates a new security group <project_name>-web, and adds ingress traffic for HTTP, SSH and ICMP" do
@@ -62,23 +88,28 @@ describe Stacko::EC2 do
 
       stack.create_security_group
     end
+
+    it "rescues and continues when exception for duplicate security group is raise" do
+      aws_ec2.should_receive(:security_groups) { aws_ec2 }
+      aws_ec2.should_receive(:create).with(security_group_name).and_raise(AWS::EC2::Errors::InvalidGroup::Duplicate)
+
+      stack.create_security_group
+    end
   end
 
-  describe "create_instance" do
+  describe "#create_instance" do
     before { AWS::EC2.should_receive(:new) { aws_ec2 } }
 
     it "creates a new instance on AWS" do
       aws_ec2.should_receive(:instances) { aws_ec2 }
-      aws_ec2.should_receive(:create).with({
-        image_id: image_id,
-        instance_type: instance_type,
-        key_name: key_name,
-        security_groups: security_group_name
-      })
+      aws_ec2.should_receive(:create)
+        .with( ec2_config.merge( { "key_name" => key_name, "security_groups" => security_group_name } ) )
+        .and_return( mock(:instance, id: "instance", status: :running) )
 
-      stack.create_instance(image_id, instance_type)
+      stack.should_receive(:save_to_yaml).with("instance")
+
+      stack.create_instance(ec2_config)
     end
-
   end
 
 end
