@@ -4,13 +4,15 @@ require 'stacko'
 
 namespace "stacko" do
   namespace "ec2" do
-    desc "Create an EC2 instance"
+    desc "Creates an EC2 instance"
     task :create, [:environment] do |t, args|
-      file_path = File.join("#{Rails.root}", "config", "stack.yml")
+      file_path = File.join("#{Rails.root}", "config", "stacko.yml")
       if File.exists?(file_path)
-        Stacko::EC2.new(environment)
+        yaml = YAML::load(ERB.new(File.read(file_path)).result)
+        env  = args.environment
+        Stacko::EC2.create(yaml, env)
       else
-        "Where's the file?"
+        puts "==> Stacko requires config/stacko.yml. Please create it."
       end
     end
   end
