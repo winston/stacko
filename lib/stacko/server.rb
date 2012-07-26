@@ -13,7 +13,7 @@ module Stacko
       #         access_key_id: "123"
       #         secret_access_key: "abc"
       #         ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
-      #       ec2:
+      #       env:
       #         staging:
       #           image_id: "ami-1234"
       #           instance_type: "m1.small"
@@ -27,7 +27,7 @@ module Stacko
           stack = Stacko::Server.new(yaml["aws"])
           stack.create_key_pair
           stack.create_security_group
-          stack.create_instance(yaml["ec2"][environment])
+          stack.create_instance(yaml["env"][environment])
         else
           puts "==> Stacko failed to create an EC2 instance. Please ensure that your config file is properly formatted."
         end
@@ -35,7 +35,7 @@ module Stacko
 
       def valid_config?(yaml, environment)
         aws_config = yaml["aws"]
-        ec2_config = yaml["ec2"][environment]
+        ec2_config = yaml["env"][environment]
 
         if aws_config.nil? || %w(access_key_id, secret_access_key).all? { |k| aws_config[k].nil? } ||
            ec2_config.nil? || %w(image_id, instance_type).all? { |k| ec2_config[k].nil? }

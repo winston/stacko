@@ -24,7 +24,7 @@ Or install it yourself as:
       access_key_id: "123"
       secret_access_key: "abc"
       ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
-    ec2:
+    env:
       staging:
         image_id: "ami-1234"
         instance_type: "m1.small"
@@ -42,3 +42,14 @@ Or install it yourself as:
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Notes
+create  env
+destroy env
+
+write better .stacko / gitignore .stacko
+chef instance
+
+status[environment]
+detail[environment]
+

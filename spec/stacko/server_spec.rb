@@ -13,7 +13,7 @@ describe Stacko::Server do
   let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.yml")) }
   let(:environment)         { "production" }
   let(:aws_config)          { yaml["aws"] }
-  let(:ec2_config)          { yaml["ec2"][environment] }
+  let(:ec2_config)          { yaml["env"][environment] }
   let(:project)             { "stacko" }
   let(:key_name)            { project }
   let(:key_pair_filename)   { "/users/winston/.ec2/#{key_name}.pem" }
