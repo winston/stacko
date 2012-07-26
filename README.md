@@ -21,8 +21,8 @@ Or install it yourself as:
 ### 1. Create config/stacko.yml
 
     aws:
-      access_key_id: "123"
-      secret_access_key: "abc"
+      access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+      secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
       ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
     env:
       staging:
