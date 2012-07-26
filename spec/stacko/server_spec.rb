@@ -77,7 +77,7 @@ describe Stacko::Server do
       aws_ec2.should_receive(:key_pairs) { aws_ec2 }
       aws_ec2.should_receive(:create).with(key_name) { key_pair }
 
-      File.should_receive(:open).with(key_pair_filename, "w").and_yield(file)
+      File.should_receive(:open).with(key_pair_filename, "w", 0600).and_yield(file)
 
       stack.create_key_pair
       file.string.should == key_pair.private_key

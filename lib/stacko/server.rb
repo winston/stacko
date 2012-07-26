@@ -70,7 +70,7 @@ module Stacko
       puts "==> Creating key pair..."
 
       @key_pair = @aws_ec2.key_pairs.create(key_name)
-      File.open(private_key_filename, "w") do |file|
+      File.open(private_key_filename, "w", 0600) do |file|
         file.write(@key_pair.private_key)
       end
 
