@@ -5,8 +5,8 @@ namespace "stacko" do
 
     puts "==> Initializing.."
 
-    `knife kitchen #{args.directory}`
-    `cd #{args.directory} && librarian-chef init`
+    system("knife kitchen #{args.directory}")
+    system("cd #{args.directory} && librarian-chef init")
 
     # Pulls in default recipes?
 
@@ -42,22 +42,30 @@ namespace "stacko" do
       exit 0
     end
 
-    file_path = File.join("config", "stacko.yml")
+    file_path = File.join(".stacko")
     if !File.exists?(file_path)
-      puts "==> Stacko requires config/stacko.yml. Please create it."
+      puts "==> Stacko requires .stacko. We can't find it, which probably means you have not launched any servers yet."
       exit 0
     end
 
     puts "==> Installing.."
 
     puts "==> Downloading cookbooks.."
-    `librarian-chef install`
+    system("librarian-chef install")
     puts "==> Successfully downloaded cookbooks"
 
     puts "==> Deploying and Executing cookbooks.."
-    `knife-solo cook #{user@machine}`
+
+    yaml = YAML::load(ERB.new(File.read(file_path)).result)
+    env  = args.environment
+    user = "ubuntu"
+    ip   = yaml[env]["ip_address"]
+
+    system("knife prepare #{user}@#{ip}")
+    system("knife cook #{user}@#{ip}")
+
     puts "==> Successfully deployed and executed cookbooks"
 
-    puts "==> Done"
+    puts "==> Done!"
   end
 end
