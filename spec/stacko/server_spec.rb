@@ -5,6 +5,7 @@ describe Stacko::Server do
   # Mocks
   let(:stack)               { Stacko::Server.new(aws_config) }
   let(:aws_ec2)             { mock(:aws_ec2) }
+  let(:instance)            { mock(:instance, id: "id-1234", ip_address: "127.0.0.1", status: :running, tags: {"environment" => environment}) }
   let(:key_pair)            { mock(:key_pair, private_key: "oh so private") }
   let(:security_group)      { mock(:security_group) }
   let(:file)                { StringIO.new }
@@ -22,7 +23,7 @@ describe Stacko::Server do
   before { stub_const("ENV", {"HOME" => "/users/winston"}) }
 
   describe ".create" do
-    let(:fake) { mock(:stack) }
+    let(:fake)   { mock(:stack) }
 
     context "valid config" do
       before { Stacko::Server.stub!(:valid_config?) { true } }
@@ -31,7 +32,8 @@ describe Stacko::Server do
         Stacko::Server.should_receive(:new).with(aws_config) { fake }
         fake.should_receive(:create_key_pair)
         fake.should_receive(:create_security_group)
-        fake.should_receive(:create_instance).with(ec2_config)
+        fake.should_receive(:create_instance).with(environment, ec2_config)
+        fake.should_receive(:save_to_yaml)
 
         Stacko::Server.create(yaml, environment)
       end
@@ -117,13 +119,27 @@ describe Stacko::Server do
     it "creates a new instance on AWS" do
       aws_ec2.should_receive(:instances) { aws_ec2 }
       aws_ec2.should_receive(:create)
-        .with( ec2_config.merge( { "key_name" => key_name, "security_groups" => [security_group_name] } ) )
-        .and_return( mock(:instance, id: "instance", status: :running) )
+        .with(ec2_config.merge({"key_name" => key_name, "security_groups" => [security_group_name]}))
+        .and_return(instance)
 
-      stack.should_receive(:save_to_yaml).with("instance")
+      instance.should_receive(:tag).with("environment", {value: "production"})
 
-      stack.create_instance(ec2_config)
+      stack.create_instance(environment, ec2_config)
     end
+  end
+
+  describe "#save_to_yaml" do
+    before { AWS::EC2.should_receive(:new) { aws_ec2 } }
+
+    it "saves to yaml file" do
+      stack.instance_variable_set(:@instance, instance)
+      File.should_receive(:open).with(".stacko", "a").and_yield(file)
+
+      stack.save_to_yaml
+      saved = YAML::load(file.string)
+      saved.should == { environment => {"instance_id" => "id-1234", "ip_address" => "127.0.0.1"} }
+    end
+
   end
 
 end

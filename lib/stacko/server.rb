@@ -23,11 +23,14 @@ module Stacko
       #   * environment: the environment to spin up the EC2 instance (staging, production etc)
       #
       def create(yaml, environment)
+        # FIXME: Check if environment is already running?
+
         if valid_config?(yaml, environment)
           stack = Stacko::Server.new(yaml["aws"])
           stack.create_key_pair
           stack.create_security_group
-          stack.create_instance(yaml["env"][environment])
+          stack.create_instance(environment, yaml["env"][environment])
+          stack.save_to_yaml
         else
           puts "==> Stacko failed to create an EC2 instance. Please ensure that your config file is properly formatted."
         end
@@ -77,9 +80,9 @@ module Stacko
     def create_key_pair
       puts "==> Creating key pair..."
 
-      key_pair = @aws_ec2.key_pairs.create(key_name)
+      @key_pair = @aws_ec2.key_pairs.create(key_name)
       File.open(private_key_filename, "w") do |file|
-        file.write(key_pair.private_key)
+        file.write(@key_pair.private_key)
       end
 
       puts "==> Successfully created key pair '#{key_name}'"
@@ -92,11 +95,11 @@ module Stacko
     def create_security_group
       puts "==> Creating security group..."
 
-      security_group = @aws_ec2.security_groups.create(security_group_name)
+      @security_group = @aws_ec2.security_groups.create(security_group_name)
 
-      security_group.allow_ping
-      security_group.authorize_ingress(:tcp, 80)
-      security_group.authorize_ingress(:tcp, 22)
+      @security_group.allow_ping
+      @security_group.authorize_ingress(:tcp, 80)
+      @security_group.authorize_ingress(:tcp, 22)
 
       puts "==> Successfully created security group '#{security_group_name}'"
     rescue AWS::EC2::Errors::InvalidGroup::Duplicate
@@ -106,28 +109,35 @@ module Stacko
     # Creates a new EC2 instance
     #
     # Parameters
+    #   * environment: a string value of the environment (staging, production etc) that instance belongs to
     #   * config: a hash with the following keys:
     #       - image_id                    AMI for the instance.   E.g. http://cloud-images.ubuntu.com/desktop/precise/current/
     #       - instance_type               Type of the instance.   E.g.  m1.small, m1.medium etc
     #
-    def create_instance(config)
+    def create_instance(environment, config)
       puts "==> Creating EC2 instance..."
 
-      instance = @aws_ec2.instances.create( config.merge( { "key_name" => key_name, "security_groups" => [security_group_name] } ) )
+      @instance = @aws_ec2.instances.create( config.merge( { "key_name" => key_name, "security_groups" => [security_group_name] } ) )
+      @instance.tag("environment", {value: environment})
 
-      while instance.status == :pending
+      while @instance.status == :pending
         print "."
         sleep 2
       end
-      puts "." # For new line
+      puts "." # new line
 
-      save_to_yaml(instance.id)
-
-      puts "==> Successfully created EC2 instance '#{instance.id}'"
+      puts "==> Successfully created EC2 instance '#{@instance.id}'"
     end
 
     def chef_instance
       # knife prepare + cook
+    end
+
+    def save_to_yaml
+      File.open(".stacko", "a") do |file|
+        hash = { @instance.tags["environment"] => { "instance_id" => @instance.id, "ip_address" => @instance.ip_address } }
+        file.write(hash.to_yaml)
+      end
     end
 
     private
@@ -146,12 +156,6 @@ module Stacko
 
     def security_group_name
       "#{project}-web"
-    end
-
-    def save_to_yaml(instance_id)
-      File.open(".stacko", "w") do |file|
-        file.write(instance_id)
-      end
     end
   end
 
