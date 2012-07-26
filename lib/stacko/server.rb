@@ -48,17 +48,6 @@ module Stacko
         end
       end
 
-      def destroy
-        # read .stacko
-        # destroy key pair
-        # destroy security group
-        # destroy instance
-        # destroy .stacko
-      end
-
-      def find
-        # find for env
-      end
     end
 
     # Initializes EC2
@@ -127,10 +116,6 @@ module Stacko
       puts "." # new line
 
       puts "==> Successfully created EC2 instance '#{@instance.id}'"
-    end
-
-    def chef_instance
-      # knife prepare + cook
     end
 
     def save_to_yaml
