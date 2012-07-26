@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'erb'
+
 namespace "stacko" do
   desc "Initializes [directory] with Chef files"
   task :init, [:directory] do |t, args|
@@ -54,17 +57,20 @@ namespace "stacko" do
     system("librarian-chef install")
     puts "==> Successfully downloaded cookbooks"
 
-    puts "==> Deploying and Executing cookbooks.."
-
     yaml = YAML::load(ERB.new(File.read(file_path)).result)
     env  = args.environment
+
     user = "ubuntu"
     ip   = yaml[env]["ip_address"]
+    key  = "~/.ec2/#{(`basename $PWD`).gsub(/\n/, "")}.pem"
 
-    system("knife prepare #{user}@#{ip}")
-    system("knife cook #{user}@#{ip}")
+    puts "==> Deploying cookbooks.."
+    system("knife prepare #{user}@#{ip} -i #{key}")
+    puts "==> Successfully deployed cookbooks"
 
-    puts "==> Successfully deployed and executed cookbooks"
+    puts "==> Executing cookbooks.."
+    system("knife cook #{user}@#{ip} -i #{key}")
+    puts "==> Successfully executed cookbooks"
 
     puts "==> Done!"
   end
