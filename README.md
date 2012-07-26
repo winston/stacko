@@ -26,11 +26,11 @@ Or install it yourself as:
       ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
     env:
       staging:
-        image_id: "ami-1234"
-        instance_type: "m1.small"
+        image_id: "ami-02581950"
+        instance_type: "t1.micro"
       production:
-        image_id: "ami-1234"
-        instance_type: "m1.large"
+        image_id: "ami-02581950"
+        instance_type: "t1.micro"
 
 ### 2. rake stacko:ec2:create[environment]
 ..where `environment` is one of the defined targets in config/stacko.yml. Using the example above, it is either "staging" or "production".
