@@ -18,7 +18,7 @@ describe Stacko::Server do
   let(:project)             { "stacko" }
   let(:key_name)            { project }
   let(:key_pair_filename)   { "/users/winston/.ec2/#{key_name}.pem" }
-  let(:security_group_name) { "#{project}-web" }
+  let(:security_group_name) { project }
 
   before { stub_const("ENV", {"HOME" => "/users/winston"}) }
 

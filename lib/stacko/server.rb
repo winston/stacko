@@ -33,13 +33,15 @@ module Stacko
           stack.save_to_yaml
         else
           puts "==> Stacko failed to create an EC2 instance. Please ensure that your config file is properly formatted."
+
+          require 'pp'
+          pp    yaml
         end
       end
 
       def valid_config?(yaml, environment)
         aws_config = yaml["aws"]
         ec2_config = yaml["env"][environment]
-
         if aws_config.nil? || %w(access_key_id, secret_access_key).all? { |k| aws_config[k].nil? } ||
            ec2_config.nil? || %w(image_id, instance_type).all? { |k| ec2_config[k].nil? }
           false
@@ -140,7 +142,7 @@ module Stacko
     end
 
     def security_group_name
-      "#{project}-web"
+      project
     end
   end
 
