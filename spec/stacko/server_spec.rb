@@ -1,66 +1,18 @@
 require 'spec_helper'
 
 describe Stacko::Server do
+  include Stacko::Settings
 
   # Mocks
   let(:stack)               { Stacko::Server.new(aws_config) }
   let(:aws_ec2)             { mock(:aws_ec2) }
-  let(:instance)            { mock(:instance, id: "id-1234", ip_address: "127.0.0.1", status: :running, tags: {"environment" => environment}) }
   let(:key_pair)            { mock(:key_pair, private_key: "oh so private") }
   let(:security_group)      { mock(:security_group) }
   let(:file)                { StringIO.new }
 
   # Expectations
   let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.yml")) }
-  let(:environment)         { "production" }
   let(:aws_config)          { yaml["aws"] }
-  let(:ec2_config)          { yaml["env"][environment] }
-  let(:project)             { "stacko" }
-  let(:key_name)            { project }
-  let(:key_pair_filename)   { "/users/winston/.ec2/#{key_name}.pem" }
-  let(:security_group_name) { project }
-
-  before { stub_const("ENV", {"HOME" => "/users/winston"}) }
-
-  describe ".create" do
-    let(:fake)   { mock(:stack) }
-
-    context "valid config" do
-      before { Stacko::Server.stub!(:valid_config?) { true } }
-
-      it "invokes the steps to create an EC2 instance" do
-        Stacko::Server.should_receive(:new).with(aws_config) { fake }
-        fake.should_receive(:create_key_pair)
-        fake.should_receive(:create_security_group)
-        fake.should_receive(:create_instance).with(environment, ec2_config)
-        fake.should_receive(:save_to_yaml)
-
-        Stacko::Server.create(yaml, environment)
-      end
-    end
-
-    context "invalid config" do
-      before { Stacko::Server.stub!(:valid_config?) { false } }
-
-      it "exits gracefully" do
-        Stacko::Server.should_not_receive(:new)
-
-        Stacko::Server.create(yaml, environment)
-      end
-    end
-  end
-
-  describe ".valid_config?" do
-    it "returns nil when all required keys are present" do
-      Stacko::Server.valid_config?(yaml, environment).should be_true
-    end
-
-    it "returns false when one or more required keys are absent" do
-      yaml.delete("aws")
-
-      Stacko::Server.valid_config?(yaml, environment).should be_false
-    end
-  end
 
   describe "#initialize" do
     it "initializes AWS config with environment variables" do
@@ -77,7 +29,7 @@ describe Stacko::Server do
       aws_ec2.should_receive(:key_pairs) { aws_ec2 }
       aws_ec2.should_receive(:create).with(key_name) { key_pair }
 
-      File.should_receive(:open).with(key_pair_filename, "w", 0600).and_yield(file)
+      File.should_receive(:open).with(private_key_file, "w", 0600).and_yield(file)
 
       stack.create_key_pair
       file.string.should == key_pair.private_key
@@ -112,34 +64,4 @@ describe Stacko::Server do
       stack.create_security_group
     end
   end
-
-  describe "#create_instance" do
-    before { AWS::EC2.should_receive(:new) { aws_ec2 } }
-
-    it "creates a new instance on AWS" do
-      aws_ec2.should_receive(:instances) { aws_ec2 }
-      aws_ec2.should_receive(:create)
-        .with(ec2_config.merge({"key_name" => key_name, "security_groups" => [security_group_name]}))
-        .and_return(instance)
-
-      instance.should_receive(:tag).with("environment", {value: "production"})
-
-      stack.create_instance(environment, ec2_config)
-    end
-  end
-
-  describe "#save_to_yaml" do
-    before { AWS::EC2.should_receive(:new) { aws_ec2 } }
-
-    it "saves to yaml file" do
-      stack.instance_variable_set(:@instance, instance)
-      File.should_receive(:open).with(".stacko", "a").and_yield(file)
-
-      stack.save_to_yaml
-      saved = YAML::load(file.string)
-      saved.should == { environment => {"instance_id" => "id-1234", "ip_address" => "127.0.0.1"} }
-    end
-
-  end
-
 end
