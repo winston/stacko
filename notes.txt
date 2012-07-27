@@ -1,0 +1,45 @@
+mkdir pie_server
+
+cd pie_server
+
+vi .rvmrc
+  rvm use --createruby-1.9.3-p194@pie_server
+
+cd .
+
+bundle
+
+Gemfile
+
+source 'http://rubygems.org'
+
+gem 'stacko', path: "~/workspace/stacko"
+
+create Rakefile?
+
+  require 'stacko'
+  load 'stacko/tasks/stacko.rake'
+
+  require '/Users/nctx/workspace/stacko/lib/stacko'
+  load '/Users/nctx/workspace/stacko/lib/tasks/stacko.rake'
+
+
+
+create config/stacko.yml
+
+  aws:
+
+    access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+    secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
+    ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
+  env:
+    staging:
+      image_id: "ami-02581950"
+      instance_type: "t1.micro"
+    production:
+      image_id: "ami-02581950"
+      instance_type: "t1.micro"
+
+rake stacko:init
+rake stacko:server_create[production]
+rake stacko:server_install[production]
