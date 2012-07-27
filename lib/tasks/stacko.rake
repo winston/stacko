@@ -2,76 +2,50 @@ require 'rubygems'
 require 'erb'
 
 namespace "stacko" do
-  desc "Initializes [directory] with Chef files"
-  task :init, [:directory] do |t, args|
-    args.with_defaults(directory: ".")
-
+  desc "Initializes with Cheffile and Chef cookbooks"
+  task :init do
     puts "==> Initializing.."
 
-    system("knife kitchen #{args.directory}")
-    system("cd #{args.directory} && librarian-chef init")
+    system("knife kitchen .")
+    system("librarian-chef init")
 
     # Pulls in default recipes?
 
     puts "==> Done!"
   end
 
-  desc "Launches an EC2 instance with the proper key pair and security group"
-  task :server_create   , [:environment] do |t, args|
+  desc "Downloads all Chef recipes listed in Cheffile to cookbooks"
+  task :cookbooks_install do
+    puts "==> Downloading cookbooks.."
+
+    system("librarian-chef install")
+
+    puts "==> Done!"
+  end
+
+  desc "Launches an EC2 instance and prepares it for Chef-solo"
+  task :server_create, [:environment] do |t, args|
     if args.to_hash.length < 1
       puts "==> Please run 'rake stacko:server_create[environment]'. Thank you."
       exit 0
     end
 
-    file_path = File.join("config", "stacko.yml")
-    if !File.exists?(file_path)
-      puts "==> Stacko requires config/stacko.yml. Please create it."
-      exit 0
-    end
-
     puts "==> Creating.."
-
-    yaml = YAML::load(ERB.new(File.read(file_path)).result)
-    env  = args.environment
-    Stacko::Server.create(yaml, env)
-
+    Stacko.create args.environment
     puts "==> Done!"
   end
 
-  desc "Performs chef-solo on an EC2 instance"
-  task :server_install  , [:environment] do |t, args|
+  desc "Uploads all cookbooks to EC2 instance and performs chef-solo"
+  task :server_install, [:environment] do |t, args|
     if args.to_hash.length < 1
       puts "==> Please run 'rake stacko:server_install[environment]'. Thank you."
       exit 0
     end
 
-    file_path = File.join(".stacko")
-    if !File.exists?(file_path)
-      puts "==> Stacko requires .stacko. We can't find it, which probably means you have not launched any servers yet."
-      exit 0
-    end
-
     puts "==> Installing.."
-
-    puts "==> Downloading cookbooks.."
-    system("librarian-chef install")
-    puts "==> Successfully downloaded cookbooks"
-
-    yaml = YAML::load(ERB.new(File.read(file_path)).result)
-    env  = args.environment
-
-    user = "ubuntu"
-    ip   = yaml[env]["ip_address"]
-    key  = "~/.ec2/#{(`basename $PWD`).gsub(/\n/, "")}.pem"
-
-    puts "==> Deploying cookbooks.."
-    system("knife prepare #{user}@#{ip} -i #{key}")
-    puts "==> Successfully deployed cookbooks"
-
-    puts "==> Executing cookbooks.."
-    system("knife cook #{user}@#{ip} -i #{key}")
-    puts "==> Successfully executed cookbooks"
-
+    Stacko.install args.environment
     puts "==> Done!"
+
   end
+
 end

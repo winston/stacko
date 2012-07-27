@@ -32,6 +32,8 @@ Or install it yourself as:
         image_id: "ami-02581950"
         instance_type: "t1.micro"
 
+# FIXME: I am assuming that only Ubuntu AMIs are used
+
 ### 2. rake stacko:ec2:create[environment]
 ..where `environment` is one of the defined targets in config/stacko.yml. Using the example above, it is either "staging" or "production".
 
