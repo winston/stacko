@@ -13,7 +13,7 @@ describe Stacko::Instance do
   let(:create_config)       { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.yml")) }
   let(:aws_config)          { create_config["aws"] }
   let(:ec2_config)          { create_config["env"][environment] }
-  let(:load_config)         { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/.stacko")) }
+  let(:load_config)         { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/dotstacko.yml")) }
   let(:instance_config)     { load_config[environment]}
 
   describe "#initialize" do
