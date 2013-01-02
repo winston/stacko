@@ -1,0 +1,11 @@
+global:
+  type: standalone
+env:
+  staging:
+    ip_address: 10.73.1.125
+    username: neo
+    password: password
+  production:
+    ip_address: 10.73.1.125
+    username: neo
+    private_key_file: '~/.ssh/id_rsa'

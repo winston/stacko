@@ -23,7 +23,7 @@ namespace "stacko" do
     puts "==> Done!"
   end
 
-  desc "Launches an EC2 instance and prepares it for Chef-solo"
+  desc "Launches an EC2 instance"
   task :server_create, [:environment] do |t, args|
     if args.to_hash.length < 1
       puts "==> Please run 'rake stacko:server_create[environment]'. Thank you."
@@ -31,7 +31,19 @@ namespace "stacko" do
     end
 
     puts "==> Creating.."
-    Stacko.create args.environment
+    Stacko.create_ec2_instance args.environment
+    puts "==> Done!"
+  end
+
+  desc "Installs Chef-solo into remote server"
+  task :server_init, [:environment] do |t, args|
+    if args.to_hash.length < 1
+      puts "==> Please run 'rake stacko:server_init[environment]'. Thank you."
+      exit 0
+    end
+
+    puts "==> Creating.."
+    Stacko.install_chef args.environment
     puts "==> Done!"
   end
 
@@ -43,7 +55,7 @@ namespace "stacko" do
     end
 
     puts "==> Installing.."
-    Stacko.install args.environment
+    Stacko.run_chef args.environment
     puts "==> Done!"
 
   end

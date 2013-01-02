@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'bundler/setup'
 
+require 'debugger'
+
 # Require Gem
 require 'stacko'
 
