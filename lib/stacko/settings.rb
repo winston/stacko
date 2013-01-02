@@ -1,6 +1,5 @@
 module Stacko
   module Settings
-
     def project_name
       (`basename $PWD`).gsub(/\n/, "")
     end
@@ -20,6 +19,5 @@ module Stacko
     def private_key_file
       "#{ENV["HOME"]}/.ec2/#{key_name}.pem"
     end
-
   end
 end

@@ -11,7 +11,7 @@ describe Stacko::Server do
   let(:file)                { StringIO.new }
 
   # Expectations
-  let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.yml")) }
+  let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.aws.yml")) }
   let(:aws_config)          { yaml["aws"] }
 
   describe "#initialize" do

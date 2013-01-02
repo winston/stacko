@@ -1,4 +1,5 @@
-aws:
+global:
+  type: aws
   access_key_id: "123"
   secret_access_key: "abc"
   ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"

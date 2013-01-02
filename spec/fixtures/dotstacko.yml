@@ -1,0 +1,4 @@
+---
+production:
+  instance_id: i-l337
+  ip_address: 0.0.0.0
