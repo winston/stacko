@@ -1,52 +1,58 @@
 module Stacko
 
   class Instance
-
+    include Stacko::Utility
     def initialize(config)
       @config = config
     end
 
     def ip_address
-      raise 'Undefined'
+      raise NotImplementedError
     end
 
-    def user_name
-      raise 'Undefined'
+    def username
+      raise NotImplementedError
     end
 
     def private_key_file
-      raise 'Undefined'
+      raise NotImplementedError
     end
 
-    def validate_config_keys(config, keys)
-      if config.nil? || keys.all? { |k| config[k].nil? }
-        puts "==> Fail.. Please ensure that your config file is properly formatted."
-        pp config
-        exit 0
-      else
-        config
-      end
+    def private_key_file?
+      File.exists?(private_key_file.to_s)
+    end
+
+    def password
+      @config.env['password'].to_s
+    end
+
+    def password?
+      !password.empty?
     end
 
   end
 
   class StandaloneInstance < Instance
 
-    attr_reader :ip_address, :user_name
+    attr_reader :ip_address, :username
 
     def initialize(config)
       super
-      validate_config_keys(config.env, %w(ip_address user_name))
+      validate_config_keys(config.env, %w(ip_address username))
       @ip_address = @config.env['ip_address']
-      @user_name = @config.env['user_name']
+      @username = @config.env['username']
+    end
+
+    def private_key_file
+      @config.env['private_key_file'].to_s
     end
 
   end
 
   class EC2Instance < Instance
-    include Stacko::Settings
+    include Stacko::EC2Settings
 
-    #user_name is mixed in from Settings
+    #username is mixed in from Settings
     #private_key_file is mixed in from Settings
     attr_reader :ip_address
 

@@ -1,6 +1,6 @@
 module Stacko
   class EC2InstanceSpawner
-    include Stacko::Settings
+    include Stacko::EC2Settings
 
     # Initialize
     #
@@ -10,8 +10,9 @@ module Stacko
     #       - secret_access_key           AWS secret access key.  E.g. https://portal.aws.amazon.com/gp/aws/securityCredentials
     #       - ec2_endpoint [optional]     AWS region.             Defaults to "ec2.us-east-1.amazonaws.com".
     #
-    def initialize(config)
+    def initialize(config, ec2_config=nil)
       @config = config
+      @ec2_config = ec2_config
       @aws_ec2 = AWS::EC2.new(@config.global)
     end
 
@@ -46,6 +47,11 @@ module Stacko
 
     def to_hash
       { @instance.tags["environment"] => { "instance_id" => @instance.id, "ip_address" => @instance.ip_address } }
+    end
+
+    def save_config
+      ec2_config = @ec2_config || EC2HostsConfiguration.new('.stacko', config.envinronment)
+      ec2_config.save to_hash
     end
 
   end

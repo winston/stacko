@@ -1,10 +1,10 @@
 module Stacko
-  module Settings
+  module EC2Settings
     def project_name
       (`basename $PWD`).gsub(/\n/, "")
     end
 
-    def user_name
+    def username
       "ubuntu"
     end
 

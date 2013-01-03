@@ -1,6 +1,6 @@
 module Stacko
   class Server
-    include Stacko::Settings
+    include Stacko::EC2Settings
 
     # Initialize
     #

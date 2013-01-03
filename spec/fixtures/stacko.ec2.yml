@@ -1,5 +1,5 @@
 global:
-  type: aws
+  type: ec2
   access_key_id: "123"
   secret_access_key: "abc"
   ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
@@ -7,6 +7,7 @@ env:
   staging:
     image_id: "ami-1234"
     instance_type: "m1.small"
+    password: 'password'
   production:
     image_id: "ami-1234"
     instance_type: "m1.large"

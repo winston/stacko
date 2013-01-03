@@ -1,7 +1,9 @@
 require 'spec_helper'
+require 'pathname'
+
+FIXTURES = Pathname.new("#{File.dirname(__FILE__)}/../fixtures/")
 
 describe Stacko::EC2InstanceSpawner do
-  include Stacko::Settings
 
   # Mocks
   let(:fake_aws_ec2)             { double(:fake_aws_ec2) }
@@ -9,8 +11,7 @@ describe Stacko::EC2InstanceSpawner do
 
   # Expectations
   let(:environment)         { "production" }
-  let(:config) { Stacko::Configuration.new "#{File.dirname(__FILE__)}/../fixtures/stacko.aws.yml", environment }
-  let(:load_config)         { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/dotstacko.yml")) }
+  let(:config) { Stacko::Configuration.new FIXTURES.join('stacko.ec2.yml'), environment }
 
   describe "#initialize" do
     it "initializes AWS config with environment variables" do
@@ -49,6 +50,23 @@ describe Stacko::EC2InstanceSpawner do
 
       it "returns a hash of details" do
         stack.to_hash.should == { environment => { "instance_id" => fake_instance.id, "ip_address" => fake_instance.ip_address } }
+      end
+
+    end
+
+    describe "#save_config" do
+      let(:ec2_host_config_path) { FIXTURES.join('saved_dotstacko.yml') }
+      let(:ec2_host_config) { Stacko::EC2HostsConfiguration.new ec2_host_config_path, environment }
+
+      subject(:stack) { Stacko::EC2InstanceSpawner.new(config, ec2_host_config) }
+
+      before { stack.instance_variable_set(:@instance, fake_instance) }
+
+      after { File.delete(ec2_host_config_path) }
+
+      it 'saves the config file' do
+        stack.save_config
+        File.exists?(ec2_host_config_path).should == true
       end
 
     end

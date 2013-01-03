@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Stacko::Server do
-  include Stacko::Settings
+  include Stacko::EC2Settings
 
   # Mocks
   let(:stack)               { Stacko::Server.new(aws_config) }
@@ -11,7 +11,7 @@ describe Stacko::Server do
   let(:file)                { StringIO.new }
 
   # Expectations
-  let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.aws.yml")) }
+  let(:yaml)                { YAML::load(File.read("#{File.dirname(__FILE__)}/../fixtures/stacko.ec2.yml")) }
   let(:aws_config)          { yaml["aws"] }
 
   describe "#initialize" do
