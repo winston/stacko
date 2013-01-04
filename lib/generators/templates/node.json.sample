@@ -1,0 +1,4 @@
+{
+  "run_list": ["recipe[chef-rack_stack]"],
+  "passenger" : { "version": "3.0.18" }
+}
