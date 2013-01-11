@@ -1,0 +1,24 @@
+global:
+  type: standalone
+env:
+  staging:
+    ip_address: <ip address>
+    username: <username>
+    password: <password>
+  production:
+    ip_address: <ip address>
+    username: <username>
+    password: <password>
+
+#global:
+#  type: ec2
+#  access_key_id: <ec2-access-key-id>
+#  secret_access_key: <ec2-secret-access-key>
+#  ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
+#env:
+#  staging:
+#    image_id: "ami-4695d614"
+#    instance_type: "m1.large"
+#  production:
+#    image_id: "ami-4695d614"
+#    instance_type: "m1.large"

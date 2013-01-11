@@ -1,15 +1,40 @@
 require 'rubygems'
 require 'erb'
+require 'fileutils'
+
+gem_dir = File.join(File.dirname(__FILE__), '..', '..')
+templates_dir = File.join(gem_dir, 'lib', 'generators', 'templates')
+
+def copy_template(template_name, dest_dir)
+  dest_file = File.join(dest_dir, template_name)
+  if File.exist?(dest_file)
+    puts "WARNING: File #{dest_file} exists, please delete it if you want to revert to defaults"
+  else
+    FileUtils.cp "#{File.join(templates_dir, template_name + '.sample')}", dest_dir
+  end
+end
 
 namespace "stacko" do
   desc "Initializes with Cheffile and Chef cookbooks"
   task :init do
     puts "==> Initializing.."
 
+    if File.exists?('cookbooks')
+      FileUtils.rm_rf 'cookbooks'
+    end
     system("knife kitchen .")
-    system("librarian-chef init")
+    copy_template('Cheffile', '.')
+    FileUtils.mkdir_p 'config'
+    copy_template('stacko.yml', 'config')
 
-    # Pulls in default recipes?
+    puts "==> Done!"
+  end
+
+  desc "Updates cookbooks"
+  task :cookbooks_update do
+    puts "==> Updating cookbooks.."
+
+    system("librarian-chef update")
 
     puts "==> Done!"
   end
