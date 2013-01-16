@@ -1,14 +1,14 @@
-global:
-  type: standalone
-env:
-  staging:
-    ip_address: <ip address>
-    username: <username>
-    password: <password>
-  production:
-    ip_address: <ip address>
-    username: <username>
-    password: <password>
+#global:
+#  type: standalone
+#env:
+#  staging:
+#    ip_address: <ip address>
+#    username: <username>
+#    password: <password>
+#  production:
+#    ip_address: <ip address>
+#    username: <username>
+#    password: <password>
 
 #global:
 #  type: ec2

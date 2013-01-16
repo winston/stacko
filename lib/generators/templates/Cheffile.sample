@@ -4,8 +4,8 @@
 site 'http://community.opscode.com/api/v1'
 
 cookbook 'chef-rack_stack',
-   :git => 'http://github.com/mohangk/chef-rack_stack'
+  :git => 'http://github.com/mohangk/chef-rack_stack'
 
- #we need to defind this because it's not hosted on opscode - putting it in chef-rack-stack metadata is not enough
- cookbook 'user',
-   :git => 'http://github.com/fnichol/chef-user'
+#we need to defind this because it's not hosted on opscode - putting it in chef-rack-stack metadata is not enough
+cookbook 'user',
+  :git => 'http://github.com/fnichol/chef-user'
