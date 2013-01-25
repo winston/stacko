@@ -26,7 +26,7 @@ module Stacko
     end
 
     def command_prefix operation
-      "knife #{operation} #{@instance.username}@#{@instance.ip_address}"
+      "knife solo #{operation} #{@instance.username}@#{@instance.ip_address}"
     end
 
 
