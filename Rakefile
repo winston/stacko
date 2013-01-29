@@ -12,4 +12,4 @@ task :default => :spec
 
 # Stacko Tasks
 require 'stacko'
-load 'lib/tasks/stacko.rake'
+require 'stacko/tasks'
