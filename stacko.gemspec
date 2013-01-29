@@ -4,8 +4,8 @@ require File.expand_path('../lib/stacko/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Winston"]
   gem.email         = ["winston.yongwei@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Stacko can help you create and setup a Rails server on AWS in a jiffy}
+  gem.summary       = %q{Stacko can help you create and setup a Rails server on AWS in a jiffy}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)

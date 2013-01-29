@@ -1,6 +1,8 @@
 # Stacko
 
-Stacko is an opinionated application deployment workflow.
+Stacko is an opinionated application deployment workflow. 
+
+For now, Stacko can help you create and setup a Rails server on AWS in a jiffy.
 
 
 ## Installation
