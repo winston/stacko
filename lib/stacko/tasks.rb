@@ -1,1 +1,1 @@
-load 'stacko/tasks/stacko.rake'
+load File.join(File.dirname(__FILE__), 'tasks', 'stacko.rake' )

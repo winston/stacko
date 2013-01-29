@@ -11,5 +11,5 @@ end
 task :default => :spec
 
 # Stacko Tasks
-require 'stacko'
-require 'stacko/tasks'
+require File.join(File.dirname(__FILE__), 'lib', 'stacko' )
+require File.join(File.dirname(__FILE__), 'lib', 'stacko', 'tasks' )
