@@ -1,6 +1,7 @@
 # Stacko
 
-TODO: Write a gem description
+Stacko is an opinionated application deployment workflow.
+
 
 ## Installation
 
@@ -16,26 +17,65 @@ Or install it yourself as:
 
     $ gem install stacko
 
+
 ## Usage
 
-### 1. Create config/stacko.yml
+### 1. Create an application deployment project folder
 
-    aws:
-      access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
-      secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
-      ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"
-    env:
-      staging:
-        image_id: "ami-02581950"
-        instance_type: "t1.micro"
-      production:
-        image_id: "ami-02581950"
-        instance_type: "t1.micro"
+    mkdir deployment
+    
+### 2. Create Gemfile in project folder
 
-# FIXME: I am assuming that only Ubuntu AMIs are used
+    source :rubygems
+    
+    gem 'rake'
+    gem 'stacko'    
 
-### 2. rake stacko:ec2:create[environment]
-..where `environment` is one of the defined targets in config/stacko.yml. Using the example above, it is either "staging" or "production".
+### 3. Create Rakefile in project folder
+
+    require 'stacko'
+    require 'stacko/tasks'
+    
+### 4. Initialize project folder with Chef directories
+
+    rake stacko:init
+    
+### 5. Download cookbooks into project folder
+
+    rake stacko:cookbooks_install    
+    
+### 6. Set up an existing server? Set up a new EC2 instance?
+
+#### 6.1  Standalone Instance
+
+##### 6.1.1 Create node.json
+
+    mv nodes/node.json.sample nodes/<remote-server-ip=address>.json
+    # Update details in <remote-server-ip=address>.json
+    # Set app name, app git, app db name and app db password   
+
+##### 6.1.2 Create stacko.yml
+
+    mv config/stacko.yml.sample config/stacko.yml
+    # Update details in stacko.yml
+    # Set remote server ip address, username and password
+
+#### 6.2  EC2 Instance
+
+    TODO
+
+### 7. Install chef-solo on server
+
+    rake stacko:server_init[environment]
+    
+..where `environment` is one of the defined targets in config/stacko.yml.
+
+### 8. Run chef-solo on server
+
+    rake stacko:server_install[environment]
+
+..where `environment` is one of the defined targets in config/stacko.yml.
+
 
 ## Contributing
 
@@ -44,14 +84,8 @@ Or install it yourself as:
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+6. Wait..
 
-## Notes
-create  env
-destroy env
+## License
 
-write better .stacko / gitignore .stacko
-chef instance
-
-status[environment]
-detail[environment]
-
+MIT License
