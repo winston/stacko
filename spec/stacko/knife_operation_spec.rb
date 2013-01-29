@@ -8,17 +8,17 @@ shared_examples 'a knife command' do
 
     context 'has a private key file only' do
       let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1', private_key_file: '~/super_secret.key', private_key_file?: true, password?: false) }
-      it { knife_operation.should_receive("system").with("knife #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file}") }
+      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file}") }
     end
 
     context 'has a password only' do
       let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1', password: 'supersecret', private_key_file?: false, password?: true) }
-      it { knife_operation.should_receive("system").with("knife #{knife_command} #{instance.username}@#{instance.ip_address} -P #{instance.password}") }
+      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -P #{instance.password}") }
     end
 
     context 'has both a private key file and a password' do
       let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1',  private_key_file: '~/super_secret.key', password: 'supersecret', private_key_file?: true, password?: true) }
-      it { knife_operation.should_receive("system").with("knife #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file}") }
+      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file}") }
     end
 
   end
