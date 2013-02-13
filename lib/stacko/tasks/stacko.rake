@@ -22,7 +22,9 @@ namespace "stacko" do
     if File.exists?('cookbooks')
       FileUtils.rm_rf 'cookbooks'
     end
-    system("knife kitchen .")
+    FileUtils.mkdir_p '.chef'
+    FileUtils.touch '.chef/knife.rb'
+    system("knife solo init .")
     copy_template('Cheffile.sample', '.', 'Cheffile')
     FileUtils.mkdir_p 'config'
     copy_template('stacko.yml.sample', 'config', 'stacko.yml.sample')
