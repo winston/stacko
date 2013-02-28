@@ -48,4 +48,18 @@ describe Stacko::KnifeOperation do
     end
 
   end
+
+  describe '#init' do
+    let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1',  private_key_file: '~/super_secret.key', password: 'supersecret', private_key_file?: true, password?: true) }
+    it 'invokes knife solo init' do
+      knife_operation.should_receive("system").with("knife solo init .")
+      knife_operation.init
+    end
+
+    it 'creates placeholders for the config files' do
+      FileUtils.should_receive('mkdir_p').with('.chef')
+      FileUtils.should_receive('touch').with('.chef/knife.rb')
+      knife_operation.init
+    end
+  end
 end

@@ -1,5 +1,8 @@
 #global:
 #  type: standalone
+#chef-rack_stack:
+#  name: 
+#  repo:
 #env:
 #  staging:
 #    ip_address: <ip address>

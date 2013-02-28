@@ -2,43 +2,21 @@ require 'rubygems'
 require 'erb'
 require 'fileutils'
 
-def copy_template(template_name, dest_dir, dest_file)
-  dest_file = File.join(dest_dir, dest_file)
-  gem_dir = File.join(File.dirname(__FILE__), '..', '..', '..')
-  templates_dir = File.join(gem_dir, 'lib', 'generators', 'templates')
-
-  if File.exist?(dest_file)
-    puts "WARNING: File #{dest_file} exists, please delete it if you want to revert to defaults"
-  else
-    FileUtils.cp "#{File.join(templates_dir, template_name)}", dest_file
-  end
-end
-
 namespace "stacko" do
-  desc "Initializes with Cheffile and Chef cookbooks"
-  task :init do
+  desc "Initializes with config.yml"
+  task :init, [:environment] do |t, args|
     puts "==> Initializing.."
 
-    if File.exists?('cookbooks')
-      FileUtils.rm_rf 'cookbooks'
-    end
-    FileUtils.mkdir_p '.chef'
-    FileUtils.touch '.chef/knife.rb'
-    system("knife solo init .")
-    copy_template('Cheffile.sample', '.', 'Cheffile')
-    FileUtils.mkdir_p 'config'
-    copy_template('stacko.yml.sample', 'config', 'stacko.yml.sample')
-    copy_template('rails.rb.sample', 'roles', 'rails.rb')
-    copy_template('node.json.sample', 'nodes', 'node.json.sample')
+    Stacko.init args.environment
 
     puts "==> Done!"
   end
 
-  desc "Updates cookbooks"
-  task :cookbooks_update do
-    puts "==> Updating cookbooks.."
+  desc "Sets up cookbook related files"
+  task :cookbooks_setup, [:environment] do |t, args|
+    puts "==> Setting up cookbooks.."
 
-    system("librarian-chef update")
+    Stacko.cookbooks_setup args.environment
 
     puts "==> Done!"
   end
@@ -47,7 +25,16 @@ namespace "stacko" do
   task :cookbooks_install do
     puts "==> Downloading cookbooks.."
 
-    system("librarian-chef install")
+    Stacko.cookbooks_install
+
+    puts "==> Done!"
+  end
+
+  desc "Updates cookbooks"
+  task :cookbooks_update do
+    puts "==> Updating cookbooks.."
+
+    Stacko.cookbooks_update
 
     puts "==> Done!"
   end

@@ -1,5 +1,5 @@
 name "rails"
-description "Rails app on passenger"
+description "Rails app on unicorn/apache"
 run_list (
   "recipe[chef-rack_stack]"
 )

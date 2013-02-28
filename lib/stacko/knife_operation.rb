@@ -17,6 +17,12 @@ module Stacko
       end
     end
 
+    def init
+      FileUtils.mkdir_p '.chef'
+      FileUtils.touch '.chef/knife.rb'
+      system("knife solo init .")
+    end
+
     def command(operation)
       if @instance.private_key_file?
         command = "#{command_prefix(operation)} -i #{@instance.private_key_file}"
