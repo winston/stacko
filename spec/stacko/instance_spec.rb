@@ -2,68 +2,79 @@ require 'spec_helper'
 
 shared_examples 'an introspectable instance' do
 
-   describe '#private_key_file?' do
+  describe '#private_key_file?' do
 
-     before { instance.stub(private_key_file: "#{File.dirname(__FILE__)}/../fixtures/dummy_secret.key") }
+    before { instance.stub(private_key_file: "#{File.dirname(__FILE__)}/../fixtures/dummy_secret.key") }
 
-     context 'private_key_file exists' do
-       it 'should return true' do
-         instance.private_key_file?.should be_true
-       end
-     end
-
-     context "no private_key_file" do
-
-       before { instance.stub(private_key_file: nil) }
-
-       it 'should return false' do
-         instance.private_key_file?.should be_false
-       end
-     end
-
-   end
-
-   describe '#password?' do
-
-      context 'password exists' do
-
-        before { instance.stub(password: 'password') }
-
-        it 'should return true' do
-          instance.password?.should be_true
-        end
+    context 'private_key_file exists' do
+      it 'should return true' do
+        instance.private_key_file?.should be_true
       end
-
-      context "no password" do
-
-        before { instance.stub(password: '') }
-
-        it 'should return false' do
-          instance.password?.should be_false
-        end
-      end
-
     end
+
+    context "no private_key_file" do
+
+      before { instance.stub(private_key_file: nil) }
+
+      it 'should return false' do
+        instance.private_key_file?.should be_false
+      end
+    end
+
+  end
+
+  describe '#password?' do
+
+    context 'password exists' do
+
+      before { instance.stub(password: 'password') }
+
+      it 'should return true' do
+        instance.password?.should be_true
+      end
+    end
+
+    context "no password" do
+
+      before { instance.stub(password: '') }
+
+      it 'should return false' do
+        instance.password?.should be_false
+      end
+    end
+
+  end
+
 
 end
 
 shared_examples '#password' do
 
-   context 'configuration has a password attribute' do
+  context 'configuration has a password attribute' do
 
-     let(:environment) { 'staging' }
+    let(:environment) { 'staging' }
 
-     it 'should return true' do
-       instance.password.should == config.env['password']
-     end
-   end
+    it 'should return true' do
+      instance.password.should == config.env['password']
+    end
+  end
 
-   context 'configuration does not have a password attribute' do
+  context 'configuration does not have a password attribute' do
 
-     it 'should return false' do
-       instance.password.should == ''
-     end
-   end
+    it 'should return false' do
+      instance.password.should == ''
+    end
+  end
+
+end
+
+shared_examples '#environment' do
+
+  let(:environment) { 'staging' }
+
+  it 'returns the config environment' do
+    instance.environment.should == config.environment
+  end
 
 end
 
@@ -103,6 +114,10 @@ describe Stacko::StandaloneInstance do
   it_behaves_like '#password' do
     let(:instance) { standalone_instance }
   end
+
+  it_behaves_like '#environment' do
+    let(:instance) { standalone_instance }
+  end
 end
 
 describe Stacko::EC2Instance do
@@ -124,4 +139,7 @@ describe Stacko::EC2Instance do
     let(:instance) { ec2_instance }
   end
 
+  it_behaves_like '#environment' do
+    let(:instance) { ec2_instance }
+  end
 end

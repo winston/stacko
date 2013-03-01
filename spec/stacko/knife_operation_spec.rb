@@ -7,18 +7,18 @@ shared_examples 'a knife command' do
     after { knife_operation.send(knife_command) }
 
     context 'has a private key file only' do
-      let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1', private_key_file: '~/super_secret.key', private_key_file?: true, password?: false) }
-      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file}") }
+      let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1', private_key_file: '~/super_secret.key', private_key_file?: true, password?: false, environment: 'production') }
+      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file} nodes/#{instance.environment}.json") }
     end
 
     context 'has a password only' do
-      let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1', password: 'supersecret', private_key_file?: false, password?: true) }
-      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -P #{instance.password}") }
+      let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1', password: 'supersecret', private_key_file?: false, password?: true, environment: 'production') }
+      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -P #{instance.password} nodes/#{instance.environment}.json") }
     end
 
     context 'has both a private key file and a password' do
-      let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1',  private_key_file: '~/super_secret.key', password: 'supersecret', private_key_file?: true, password?: true) }
-      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file}") }
+      let(:instance) { double(username: 'Ben', ip_address: '127.0.0.1',  private_key_file: '~/super_secret.key', password: 'supersecret', private_key_file?: true, password?: true, environment: 'production') }
+      it { knife_operation.should_receive("system").with("knife solo #{knife_command} #{instance.username}@#{instance.ip_address} -i #{instance.private_key_file} nodes/#{instance.environment}.json") }
     end
 
   end

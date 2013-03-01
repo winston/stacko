@@ -51,7 +51,7 @@ module Stacko
     def _cookbooks_setup
       copy_template('rails.rb', 'roles/rails.rb')
       copy_template('Cheffile', 'Cheffile')
-      render_template('node.json.erb', "nodes/#{config['env'][environment]['ip_address']}.json")
+      render_template('node.json.erb', "nodes/#{environment}.json")
     end
 
     def _cookbooks_install

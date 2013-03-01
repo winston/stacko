@@ -29,11 +29,14 @@ module Stacko
       elsif @instance.password?
         command = "#{command_prefix(operation)} -P #{@instance.password}"
       end
+
+      "#{command} nodes/#{@instance.environment}.json"
     end
 
     def command_prefix operation
       "knife solo #{operation} #{@instance.username}@#{@instance.ip_address}"
     end
+
 
 
   end

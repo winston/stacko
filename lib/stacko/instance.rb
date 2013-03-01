@@ -30,6 +30,9 @@ module Stacko
       !password.empty?
     end
 
+    def environment
+      @config.environment
+    end
   end
 
   class StandaloneInstance < Instance
