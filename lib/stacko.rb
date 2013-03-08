@@ -33,14 +33,6 @@ module Stacko
 
     end
 
-    def _install_chef
-      KnifeOperation.new(instance).prepare
-    end
-
-    def _run_chef
-      KnifeOperation.new(instance).cook
-    end
-
     def _init
       KnifeOperation.new(nil).init
       FileUtils.rm_rf 'cookbooks'
@@ -48,18 +40,26 @@ module Stacko
       copy_template('stacko.yml', 'config/stacko.yml')
     end
 
-    def _cookbooks_setup
-      copy_template('rails.rb', 'roles/rails.rb')
-      copy_template('Cheffile', 'Cheffile')
-      render_template('node.json.erb', "nodes/#{environment}.json")
+    def _init_cookbook(cookbook)
+      copy_template("#{cookbook}/#{cookbook}.rb", "roles/rails.rb")
+      copy_template("#{cookbook}/Cheffile", "Cheffile")
+      render_template("node.json.erb", "nodes/#{environment}.json")
     end
 
-    def _cookbooks_install
+    def _install_cookbook
       system("librarian-chef install")
     end
 
-    def _cookbooks_update
+    def _update_cookbook
       system("librarian-chef update")
+    end
+
+    def _install_chef
+      KnifeOperation.new(instance).prepare
+    end
+
+    def _run_chef
+      KnifeOperation.new(instance).cook
     end
 
     private

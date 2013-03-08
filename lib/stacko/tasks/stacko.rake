@@ -2,41 +2,32 @@ require 'rubygems'
 require 'erb'
 require 'fileutils'
 
+desc "Initializes with config.yml"
+task :stacko do |t, args|
+  puts "==> Initializing.."
+  Stacko.init
+  puts "==> Done!"
+end
+
 namespace "stacko" do
-  desc "Initializes with config.yml"
-  task :init, [:environment] do |t, args|
-    puts "==> Initializing.."
+  namespace "cookbook" do
+    desc "Sets up Chefile for specific role, and downloads all recipes to cookbooks."
+    task :install, [:environment, :cookbook] do |t, args|
+      puts "==> Setting up cookbooks.."
+      Stacko.init_cookbook args.environment, args.cookbook
 
-    Stacko.init args.environment
+      puts "==> Downloading cookbooks.."
+      Stacko.install_cookbook
 
-    puts "==> Done!"
-  end
+      puts "==> Done!"
+    end
 
-  desc "Sets up cookbook related files"
-  task :cookbooks_setup, [:environment] do |t, args|
-    puts "==> Setting up cookbooks.."
-
-    Stacko.cookbooks_setup args.environment
-
-    puts "==> Done!"
-  end
-
-  desc "Downloads all Chef recipes listed in Cheffile to cookbooks"
-  task :cookbooks_install do
-    puts "==> Downloading cookbooks.."
-
-    Stacko.cookbooks_install
-
-    puts "==> Done!"
-  end
-
-  desc "Updates cookbooks"
-  task :cookbooks_update do
-    puts "==> Updating cookbooks.."
-
-    Stacko.cookbooks_update
-
-    puts "==> Done!"
+    desc "Updates cookbook"
+    task :update do
+      puts "==> Updating cookbooks.."
+      Stacko.update_cookbook
+      puts "==> Done!"
+    end
   end
 
   desc "Launches an EC2 instance"
