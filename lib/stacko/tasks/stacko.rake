@@ -11,8 +11,13 @@ end
 
 namespace "stacko" do
   namespace "cookbook" do
-    desc "Sets up Chefile for specific role, and downloads all recipes to cookbooks."
+    desc "Sets up Chefile for specific role, and downloads all recipes to cookbooks"
     task :install, [:environment, :cookbook] do |t, args|
+      if args.to_hash.length < 2
+        puts "==> Please run 'rake stacko:cookbook:install[environment,cookbook]'. Thank you."
+        exit 0
+      end
+
       puts "==> Setting up cookbooks.."
       Stacko.init_cookbook args.environment, args.cookbook
 
