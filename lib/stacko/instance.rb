@@ -1,7 +1,7 @@
 module Stacko
-
   class Instance
     include Stacko::Utility
+    
     def initialize(config)
       @config = config
     end
@@ -49,14 +49,13 @@ module Stacko
     def private_key_file
       @config.env['private_key_file'].to_s
     end
-
   end
 
   class EC2Instance < Instance
     include Stacko::EC2Settings
 
-    #username is mixed in from Settings
-    #private_key_file is mixed in from Settings
+    # username is mixed in from Settings
+    # private_key_file is mixed in from Settings
     attr_reader :ip_address
 
     def initialize(config, ec2_host_config = nil)
@@ -64,7 +63,5 @@ module Stacko
       ec2_host_config = ec2_host_config || EC2HostsConfiguration.new('.stacko')
       @ip_address = ec2_host_config['ip_address']
     end
-
   end
-
 end
