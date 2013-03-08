@@ -18,21 +18,6 @@ module Stacko
       send("_#{m}", *args, &block)
     end
 
-    def _create_ec2_instance
-      # FIXME: Verify if there alread is an instance for the environment we are trying to launch
-
-      ec2_config = Stacko::EC2HostsConfiguration.new(File.join(".stacko"), environment)
-
-      server = Stacko::Server.new config.global
-      server.create_key_pair
-      server.create_security_group
-
-      instance = Stacko::EC2InstanceSpawner.new config, ec2_config
-      instance.launch
-      instance.save_config
-
-    end
-
     def _init
       KnifeOperation.new(nil).init
       FileUtils.rm_rf 'cookbooks'
@@ -41,9 +26,9 @@ module Stacko
     end
 
     def _init_cookbook(cookbook)
-      copy_template("#{cookbook}/#{cookbook}.rb", "roles/rails.rb")
+      copy_template("#{cookbook}/#{cookbook}.rb", "roles/#{cookbook}.rb")
       copy_template("#{cookbook}/Cheffile", "Cheffile")
-      render_template("node.json.erb", "nodes/#{environment}.json")
+      render_template("#{cookbook}/node.json.erb", "nodes/#{environment}.json")
     end
 
     def _install_cookbook
@@ -60,6 +45,20 @@ module Stacko
 
     def _run_chef
       KnifeOperation.new(instance).cook
+    end
+
+    def _create_ec2_instance
+      # FIXME: Verify if there alread is an instance for the environment we are trying to launch
+
+      ec2_config = Stacko::EC2HostsConfiguration.new(File.join(".stacko"), environment)
+
+      server = Stacko::Server.new config.global
+      server.create_key_pair
+      server.create_security_group
+
+      instance = Stacko::EC2InstanceSpawner.new config, ec2_config
+      instance.launch
+      instance.save_config
     end
 
     private
