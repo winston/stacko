@@ -37,7 +37,5 @@ module Stacko
       "knife solo #{operation} #{@instance.username}@#{@instance.ip_address}"
     end
 
-
-
   end
 end
