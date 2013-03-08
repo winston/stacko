@@ -1,8 +1,7 @@
 #global:
 #  type: standalone
-#chef-rack_stack:
-#  name: 
-#  repo:
+#  app_name: my_app
+#  app_repo: https://github.com/example/example
 #env:
 #  staging:
 #    ip_address: <ip address>
@@ -13,8 +12,11 @@
 #    username: <username>
 #    password: <password>
 
+
 #global:
 #  type: ec2
+#  app_name: my_app
+#  app_repo: https://github.com/example/example
 #  access_key_id: <ec2-access-key-id>
 #  secret_access_key: <ec2-secret-access-key>
 #  ec2_endpoint: "ec2.ap-southeast-1.amazonaws.com"

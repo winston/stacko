@@ -106,7 +106,7 @@ module Stacko
     end
 
     def template_binding
-      app = config['chef-rack_stack']
+      app = config['global']
       binding
     end
   end

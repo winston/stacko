@@ -2,9 +2,9 @@
   "run_list"   : ["role[rails]"],
   "chef-rack_stack": {
     "app" : {
-      "name": "<%= app['name'] %>",
-      "repo": "<%= app['repo'] %>",
-      "db": "<%= app['name'] %>"
+      "name": "<%= app['app_name'] %>",
+      "repo": "<%= app['app_repo'] %>",
+      "db": "<%= app['app_name'] %>"
     }
   },
   "postgresql": {
