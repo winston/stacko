@@ -10,7 +10,7 @@ module Stacko
 
         raise "You should either supply a private key file or password." if !@instance.password? and !@instance.private_key_file?
 
-        puts "==> Preparing EC2 instance with chef-solo..."
+        puts "==> Preparing with chef-solo..."
         puts "==> Running '#{command(operation)}'"
         system(command(operation))
         puts "==> Finished preparing instance '#{@instance.ip_address}'"
